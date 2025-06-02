@@ -1,36 +1,59 @@
 import React, { useState } from 'react';
-import '../styles/home.css'; 
-
+import { useNavigate } from 'react-router-dom';
+import '../styles/home.css';
+import { BsSun, BsMoon, BsList } from 'react-icons/bs'; // for icons
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   const toggleMenu = () => {
-    setIsOpen(prev => !prev);
+    setMenuOpen(prev => !prev);
+  };
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+    document.body.classList.toggle('light-mode');
   };
 
   return (
-    <div className="navbar">
-      <div className="nav-left">
-        <div className="logo">
-          <img src="https://img.freepik.com/free-vector/realistic-elegant-frame-design_23-2149257738.jpg?ga=GA1.1.149383177.1734934021&semt=ais_hybrid&w=740" alt="logo_img" />
-          <span><p className="logo-txt">AbsolutZero</p></span>
+    <nav className="navbar">
+      <div className="logo">
+        <img
+          src="https://img.freepik.com/free-vector/realistic-elegant-frame-design_23-2149257738.jpg"
+          alt="logo"
+        />
+        <span className="logo-txt">AbsolutZero</span>
+      </div>
+
+      <div className="right-section">
+        {/* Theme Toggle */}
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {darkMode ? <BsSun /> : <BsMoon />}
+        </button>
+
+        {/* Hamburger */}
+        <div className="hamburger" onClick={toggleMenu}>
+          <BsList />
         </div>
       </div>
 
-      {/* Hamburger Icon - Mobile only */}
-      <div className="hamburger" onClick={toggleMenu}>
-        <i className="bx bx-menu"></i>
-      </div>
-
-      {/* Nav Links */}
-      <div className={`nav-right ${isOpen ? 'active' : ''}`}>
-        <ul className="nav-links">
-          <li><a href="/signup">Signup</a></li>
-          <li><a href="/about">About</a></li>
+      <div className={`nav-links ${menuOpen ? 'show' : ''}`}>
+        <ul>
+          <li>
+            <a onClick={() => navigate('/about')} style={{ cursor: 'pointer' }}>
+              About
+            </a>
+          </li>
+          <li>
+            <a onClick={() => navigate('/signup')} style={{ cursor: 'pointer' }}>
+              Signup
+            </a>
+          </li>
         </ul>
       </div>
-    </div>
+    </nav>
   );
 };
 
