@@ -1,45 +1,106 @@
 import React from 'react';
-import '../styles/home.css';
 import Navbar from '../components/navbar';
-import {motion} from 'framer-motion';
-// import { Link } from "react-router-dom"; 
+import Footer from '../components/footer';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-
 
 function Homepage() {
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate('/timer'); // Adjust the route if needed
-  };
-
   return (
-    <div className="homecontainer">
-         <section className="header">
-        <Navbar/>
-        </section>
+    <div className="min-h-screen bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364] text-[#a0e9ff] font-display">
+      <header className="sticky top-0 z-50">
+        <Navbar />
+      </header>
 
-       <section className="hero-section">
-  <motion.div
-    className="hero-content"
-    initial={{ opacity: 0, y: 40 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.8, ease: "easeOut" }}
-  >
-    <h1 className="hero-topic">Zero Distraction. Absolut Productivity.</h1>
-    <p className="hero-text">
-      A productivity timer with chill vibes to help you work in focused bursts and cool down in breaks.
-    </p>
-  </motion.div>
-  <button className="cta-button" onClick={handleClick}>
-      Launch Timer
-    </button>
-  
-</section>
+      {/* Hero Section */}
+      <section className="flex flex-col justify-center items-center text-center px-4 py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 drop-shadow-lg">
+            Zero Distraction. Absolut Productivity.
+          </h1>
+          <p className="max-w-xl mx-auto text-base sm:text-lg">
+            A productivity timer with chill vibes to help you work in focused bursts and cool down in breaks.
+          </p>
+        </motion.div>
+
+        <div className="mt-10 flex flex-col sm:flex-row gap-4">
+          <button
+            onClick={() => navigate('/signup')}
+            className="px-6 py-3 text-primary font-semibold bg-[#a0e9ff] text-[#0f2027] rounded-full shadow-lg hover:bg-[#d0faff] transition"
+          >
+            Get Started
+          </button>
+          <button
+            onClick={() => navigate('/signin')}
+            className="px-6 py-3 text-primary font-semibold bg-transparent border border-[#a0e9ff] text-[#a0e9ff] rounded-full hover:bg-white hover:text-[#0f2027] transition"
+          >
+            I already have an account
+          </button>
+        </div>
+      </section>
+
+      {/* Aims Section */}
+      <section className="px-6 py-16 bg-transparent">
+        <h2 className="text-3xl font-bold text-center mb-12">Our Aims</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          {aims.map((aim, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="flex flex-col justify-between p-6 rounded-xl bg-[#a0e9ff] text-[#0f2027] shadow-md"
+            >
+              <div className="text-4xl text-accent mb-4">
+                <i className={`bx ${aim.icon}`}></i>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{aim.title}</h3>
+              <p className="text-sm">{aim.description}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+      <Footer />
+      
     </div>
-   
-  );
-};
+
     
+  );
+}
+
+const aims = [
+  {
+    title: 'Eliminate Distractions',
+    description:
+      'Create a zero-interruption environment through soft blocking tools that help you stay in control — not cut off.',
+    icon: 'bxs-shield-x',
+  },
+  {
+    title: 'Focus Intentionally',
+    description:
+      'Whether you use a Pomodoro rhythm or a fully custom timer, AbsolutZero helps you dive into deep work with purpose.',
+    icon: 'bxs-timer',
+  },
+  {
+    title: 'Track Your Progress',
+    description:
+      'Monitor your focus sessions, see your improvement, and understand your patterns with clean, simple analytics.',
+    icon: 'bxs-bar-chart-alt-2',
+  },
+  {
+    title: 'Build Sustainable Habits',
+    description:
+      'More than productivity, AbsolutZero is about consistency. Small steps, well-tracked, done beautifully.',
+    icon: 'bxs-calendar-check',
+  },
+];
+
+
 
 export default Homepage;
