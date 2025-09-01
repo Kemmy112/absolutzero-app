@@ -8,7 +8,7 @@ function Homepage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364] text-[#a0e9ff] font-display">
+    <div className="w-full min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-800 dark:from-[#0f2027] dark:via-[#203a43] dark:to-[#2c5364] dark:text-[#a0e9ff] transition-colors">
       <header className="sticky top-0 z-50">
         <Navbar />
       </header>
@@ -30,17 +30,12 @@ function Homepage() {
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4">
           <button
-            onClick={() => navigate('/signup')}
+            onClick={() => navigate('/dashboard')}
             className="px-6 py-3 text-primary font-semibold bg-[#a0e9ff] text-[#0f2027] rounded-full shadow-lg hover:bg-[#d0faff] transition"
           >
             Get Started
           </button>
-          <button
-            onClick={() => navigate('/signin')}
-            className="px-6 py-3 text-primary font-semibold bg-transparent border border-[#a0e9ff] text-[#a0e9ff] rounded-full hover:bg-white hover:text-[#0f2027] transition"
-          >
-            I already have an account
-          </button>
+         
         </div>
       </section>
 

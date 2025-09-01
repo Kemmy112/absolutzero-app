@@ -1,99 +1,175 @@
-import { useState, useEffect } from 'react';
-import { Menu, X, Bell, UserCircle2 } from 'lucide-react';
-import { supabase } from '../services/supabase';
+import React, { useState, useEffect } from "react";
+
+// Scroll Picker component (simple Tailwind version)
+const TimePicker = ({ label, max, value, onChange }) => (
+  <div className="flex flex-col items-center">
+    <span className="text-[#a0e9ff] text-sm mb-2">{label}</span>
+    <div className="h-24 overflow-y-scroll scrollbar-hide snap-y snap-mandatory bg-[#1a2e35] rounded-lg p-2">
+      {[...Array(max + 1).keys()].map((num) => (
+        <div
+          key={num}
+          onClick={() => onChange(num)}
+          className={`snap-center py-2 px-4 cursor-pointer rounded-md text-center ${
+            num === value
+              ? "bg-[#0f2027] text-[#a0e9ff] font-bold"
+              : "text-gray-400"
+          }`}
+        >
+          {num.toString().padStart(2, "0")}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 
 const Dashboard = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [username, setUsername] = useState('');
+  const [task, setTask] = useState("");
+  const [time, setTime] = useState({ hours: 0, minutes: 25, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [isActive, setIsActive] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [recentTasks, setRecentTasks] = useState([]);
 
+  // Timer logic
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single();
-      if (data?.username) setUsername(data.username);
-    };
+    let timer;
+    if (isActive && timeLeft > 0) {
+      timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+    } else if (isActive && timeLeft === 0) {
+      setIsActive(false);
+      setStreak((s) => s + 1);
+      setRecentTasks((prev) => [
+        {
+          name: task,
+          duration: `${time.hours}h ${time.minutes}m ${time.seconds}s`,
+          completed: new Date().toLocaleTimeString(),
+        },
+        ...prev,
+      ].slice(0, 5));
+    }
+    return () => clearInterval(timer);
+  }, [isActive, timeLeft]);
 
-    fetchUserProfile();
-  }, []);
+  const startTask = () => {
+    const totalSeconds = time.hours * 3600 + time.minutes * 60 + time.seconds;
+    setTimeLeft(totalSeconds);
+    setIsActive(true);
+  };
 
-  const navItems = ['Home', 'Recents', 'Weekly Logs', 'Settings', 'Log out'];
+  const formatTime = (secs) => {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    return `${h.toString().padStart(2, "0")}:${m
+      .toString()
+      .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary text-white flex flex-col">
-      {/* Top Navbar */}
-      <div className="flex justify-between items-center p-4 bg-white/5 border-b border-white/10">
-        <button onClick={() => setDrawerOpen(!drawerOpen)}>
-          {drawerOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-        <div className="flex items-center gap-4">
-          <Bell size={20} />
-          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-            <UserCircle2 />
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#0f2027] text-white px-6 py-10">
+      <h1 className="text-3xl font-bold text-[#a0e9ff] mb-8">Dashboard</h1>
+
+      {/* Streak Counter */}
+      <div className="mb-6 p-4 bg-[#1a2e35] rounded-2xl shadow-md text-center">
+        <p className="text-lg">🔥 Current Streak: <span className="font-bold text-[#a0e9ff]">{streak}</span></p>
       </div>
 
-      {/* Side Drawer */}
-      {drawerOpen && (
-        <div className="fixed top-0 left-0 w-64 h-full bg-white/10 backdrop-blur-lg p-6 z-50">
-          <h2 className="text-xl font-bold mb-6">Navigation</h2>
-          <nav className="flex flex-col gap-3">
-            {navItems.map(item => (
-              <button
-                key={item}
-                onClick={() => setDrawerOpen(false)}
-                className="text-left text-white hover:text-accent"
-              >
-                {item}
-              </button>
-            ))}
-          </nav>
+      {/* Task Form */}
+      {!isActive && timeLeft === null && (
+        <div className="bg-[#1a2e35] p-6 rounded-2xl shadow-md mb-8">
+          <h2 className="text-xl font-semibold text-[#a0e9ff] mb-4">Create New Task</h2>
+          <input
+            type="text"
+            placeholder="Enter task name..."
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            className="w-full p-3 rounded-lg mb-6 bg-[#0f2027] text-white placeholder-gray-400 focus:outline-none"
+          />
+
+
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <TimePicker
+              label="Hours"
+              max={5}
+              value={time.hours}
+              onChange={(val) => setTime((prev) => ({ ...prev, hours: val }))}
+            />
+            <TimePicker
+              label="Minutes"
+              max={59}
+              value={time.minutes}
+              onChange={(val) => setTime((prev) => ({ ...prev, minutes: val }))}
+            />
+            <TimePicker
+              label="Seconds"
+              max={59}
+              value={time.seconds}
+              onChange={(val) => setTime((prev) => ({ ...prev, seconds: val }))}
+            />
+          </div>
+          
+
+          <button
+            onClick={startTask}
+            disabled={!task}
+            className="w-full py-3 rounded-lg bg-[#a0e9ff] text-[#0f2027] font-bold hover:bg-[#89d8ff] transition disabled:opacity-50"
+          >
+            Start Task
+          </button>
         </div>
       )}
 
-      {/* Main Dashboard Content */}
-      <div className="p-6 flex-1 overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-2">Welcome back, {username || 'friend'} 👋</h1>
-        <p className="text-white/70 mb-6 italic">Let’s log something awesome — it’s a write time to shine!</p>
-
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="p-4 bg-white/10 rounded-xl shadow text-white">
-            <h3 className="font-semibold text-lg">Logs This Week</h3>
-            <p className="text-3xl font-bold mt-2">8</p>
+      {/* Timer */}
+      {timeLeft !== null && (
+        <div className="bg-[#1a2e35] p-6 rounded-2xl shadow-md text-center">
+          <h2 className="text-xl font-semibold mb-4">{task}</h2>
+          <div className="text-5xl font-bold text-[#a0e9ff] mb-4">
+            {formatTime(timeLeft)}
           </div>
-          <div className="p-4 bg-white/10 rounded-xl shadow text-white">
-            <h3 className="font-semibold text-lg">Focus Hours</h3>
-            <p className="text-3xl font-bold mt-2">12h</p>
-          </div>
-          <div className="p-4 bg-white/10 rounded-xl shadow text-white">
-            <h3 className="font-semibold text-lg">Streak</h3>
-            <p className="text-3xl font-bold mt-2">🔥 5 days</p>
-          </div>
+          <button
+            onClick={() => setIsActive(!isActive)}
+            className="px-6 py-2 rounded-lg bg-[#a0e9ff] text-[#0f2027] font-semibold mr-3"
+          >
+            {isActive ? "Pause" : "Resume"}
+          </button>
+          <button
+            onClick={() => {
+              setTask("");
+              setTimeLeft(null);
+              setIsActive(false);
+            }}
+            className="px-6 py-2 rounded-lg bg-red-500 text-white font-semibold"
+          >
+            End
+          </button>
         </div>
+      )}
 
-        {/* Chart Placeholder */}
-        <div className="bg-white/10 p-6 rounded-xl mb-8 shadow">
-          <h3 className="text-lg font-semibold mb-2">Weekly Activity</h3>
-          <div className="h-40 flex items-center justify-center text-white/40 italic">[Will be updated soon...]</div>
-        </div>
-
-        {/* Achievements */}
-        <div className="bg-white/10 p-6 rounded-xl shadow">
-          <h3 className="text-lg font-semibold mb-4">Achievements</h3>
-          <div className="flex flex-wrap gap-4">
-            <div className="w-24 h-24 bg-accent rounded-full flex items-center justify-center text-white font-bold shadow">🏆</div>
-            <div className="w-24 h-24 bg-accent/70 rounded-full flex items-center justify-center text-white font-bold shadow">🎯</div>
-            <div className="w-24 h-24 bg-accent/50 rounded-full flex items-center justify-center text-white font-bold shadow">🧠</div>
-          </div>
-        </div>
+      {/* Recent Tasks */}
+      <div className="mt-8 bg-[#1a2e35] p-6 rounded-2xl shadow-md">
+        <h2 className="text-lg font-semibold text-[#a0e9ff] mb-3">Recent Tasks</h2>
+        {recentTasks.length === 0 ? (
+          <p className="text-gray-400 text-sm">No tasks completed yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {recentTasks.map((t, i) => (
+              <li
+                key={i}
+                className="flex justify-between text-sm bg-[#0f2027] p-3 rounded-lg"
+              >
+                <span className="font-medium text-[#a0e9ff]">{t.name}</span>
+                <span className="text-gray-400">{t.duration} • {t.completed}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
 };
 
 export default Dashboard;
+
+
+
