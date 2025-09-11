@@ -21,7 +21,7 @@ function Homepage() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-            Zero Distraction. Absolut Productivity.
+            Zero Distractions. Absolut Productivity.
           </h1>
           <p className="max-w-xl mx-auto text-base sm:text-lg">
             A productivity timer with chill vibes to help you work in focused bursts and cool down in breaks.
@@ -30,7 +30,7 @@ function Homepage() {
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/signup')}
             className="px-6 py-3 text-primary font-semibold bg-[#a0e9ff] text-[#0f2027] rounded-full shadow-lg hover:bg-[#d0faff] transition"
           >
             Get Started
