@@ -8,7 +8,7 @@ import Themetoggle from './components/themetoggle';
 import Homepage from './pages/home';
 import Signup from './auth/signup';
 import Signin from './auth/signin';
-import ConfirmEmail from './auth/confirmemail';
+import Verifyotp from './auth/verifyotp';
 import Onboarding from './pages/onboarding';
 import Dashboard from './pages/dashboard';
 import About from './pages/about';
@@ -23,7 +23,7 @@ function App() {
       <Route path='/themetoggle' element={<Themetoggle/>} />
       <Route path='/signup' element={<Signup/>} />
       <Route path='/signin' element={<Signin/>} />
-      <Route path='/confirmemail' element={<ConfirmEmail/>} />
+      <Route path='/verifyotp' element={<Verifyotp/>} />
       <Route path='/onboarding' element={<Onboarding/>} />
       <Route path='/dashboard' element={<Dashboard/>} />
       <Route path='/about' element={<About/>} />
