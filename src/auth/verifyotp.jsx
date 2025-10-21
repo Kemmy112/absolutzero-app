@@ -6,11 +6,21 @@ import { supabase } from "../supabase";
 export default function Verifyotp() {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
+
+  // Prefer localStorage if page refreshed
+  const storedEmail = localStorage.getItem("signupEmail");
+  const email = location.state?.email || storedEmail;
+
   const [token, setToken] = useState("");
   const [timer, setTimer] = useState(60);
   const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (email) localStorage.setItem("signupEmail", email);
+  }, [email]);
+
+  // Countdown timer
   useEffect(() => {
     if (timer > 0) {
       const countdown = setTimeout(() => setTimer((t) => t - 1), 1000);
@@ -20,18 +30,60 @@ export default function Verifyotp() {
 
   const handleVerify = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: "email",
-    });
-    if (error) setErrorMsg(error.message);
-    else navigate("/onboarding");
+    if (!email) return setErrorMsg("Email not found. Go back and signup again.");
+    setLoading(true);
+
+    try {
+      // Verify OTP with Supabase
+      const { error, data } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: "email",
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+        setLoading(false);
+        return;
+      }
+
+      // OTP successful → check tempPassword in user metadata
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) throw new Error("User not found.");
+
+      const user = userData.user;
+      const tempPassword = user.user_metadata?.tempPassword;
+
+      // Set the real password for login
+      if (tempPassword) {
+        const { error: updatePwdErr } = await supabase.auth.updateUser({
+          password: tempPassword,
+        });
+        if (updatePwdErr) throw updatePwdErr;
+      }
+
+      // Clear temp storage
+      localStorage.removeItem("signupEmail");
+
+      // Redirect to onboarding
+      navigate("/onboarding");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || "OTP verification failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resendOtp = async () => {
-    await supabase.auth.signInWithOtp({ email });
+    if (!email) return;
     setTimer(60);
+    try {
+      await supabase.auth.signInWithOtp({ email });
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Failed to resend OTP. Try again.");
+    }
   };
 
   return (
@@ -61,9 +113,10 @@ export default function Verifyotp() {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-xl"
           >
-            Verify
+            {loading ? "Verifying..." : "Verify"}
           </button>
 
           <div className="text-center text-sm mt-3 text-sky-700">

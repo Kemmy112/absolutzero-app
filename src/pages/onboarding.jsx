@@ -1,283 +1,288 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabase";
-import {
-  Moon,
-  Sun,
-  ArrowRight,
-  ArrowLeft,
-  Upload,
-  Loader2,
-} from "lucide-react";
 
 export default function Onboarding() {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-
+  const [username, setUsername] = useState("");
+  const [usernameStatus, setUsernameStatus] = useState("");
   const [formData, setFormData] = useState({
-    username: "",
-    goals: [],
-    preferences: [],
-    discovery: "",
+    goals: "",
+    preferences: "",
+    source: "",
     profileImage: null,
   });
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 5));
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
-  const toggleDarkMode = () => setDarkMode((prev) => !prev);
+  const totalSteps = 5;
 
-  const toggleGoal = (goal) => {
-    setFormData((prev) => ({
-      ...prev,
-      goals: prev.goals.includes(goal)
-        ? prev.goals.filter((g) => g !== goal)
-        : [...prev.goals, goal],
-    }));
+  // 🧊 Real-time username validation
+  useEffect(() => {
+    const checkUsername = async () => {
+      if (username.trim().length < 3) {
+        setUsernameStatus("Too short");
+        return;
+      }
+      const validPattern = /^[a-zA-Z0-9._]+$/;
+      if (!validPattern.test(username)) {
+        setUsernameStatus("Invalid characters");
+        return;
+      }
+      const { data } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("username", username)
+        .maybeSingle();
+      if (data) setUsernameStatus("Taken");
+      else setUsernameStatus("Available");
+    };
+
+    if (username) {
+      const debounce = setTimeout(checkUsername, 600);
+      return () => clearTimeout(debounce);
+    } else {
+      setUsernameStatus("");
+    }
+  }, [username]);
+
+  const nextStep = () => setStep((s) => Math.min(s + 1, totalSteps));
+  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const togglePreference = (pref) => {
-    setFormData((prev) => ({
-      ...prev,
-      preferences: prev.preferences.includes(pref)
-        ? prev.preferences.filter((p) => p !== pref)
-        : [...prev.preferences, pref],
-    }));
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) setFormData((prev) => ({ ...prev, profileImage: file }));
+  const handleImageUpload = (e) => {
+    setFormData({ ...formData, profileImage: e.target.files[0] });
   };
 
   const handleSubmit = async () => {
-    try {
-      setLoading(true);
-      const { data: authData, error: authError } = await supabase.auth.getUser();
-      if (authError || !authData?.user) throw new Error("User not found.");
-
-      const user = authData.user;
-      let imageUrl = null;
-
-      // Upload profile image
-      if (formData.profileImage) {
-        const { error: uploadError } = await supabase.storage
-          .from("avatars")
-          .upload(`public/${user.id}.png`, formData.profileImage, {
-            upsert: true,
-          });
-        if (uploadError) throw uploadError;
-
-        const { data: publicURL } = supabase.storage
-          .from("avatars")
-          .getPublicUrl(`public/${user.id}.png`);
-        imageUrl = publicURL.publicUrl;
-      }
-
-      // Update profile info
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          username: formData.username,
-          goals: formData.goals,
-          preferences: formData.preferences,
-          discovery: formData.discovery,
-          profile_image_url: imageUrl,
-          updated_at: new Date(),
-        })
-        .eq("id", user.id);
-
-      if (updateError) throw updateError;
-
-      navigate("/dashboard");
-    } catch (err) {
-      console.error(err.message);
-      alert("Error completing onboarding: " + err.message);
-    } finally {
-      setLoading(false);
-    }
+    // handle saving onboarding data
+    console.log("Submitting onboarding:", { username, ...formData });
   };
-
-  useEffect(() => {
-    document.body.classList.toggle("dark", darkMode);
-  }, [darkMode]);
-
-  const fade = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
-    transition: { duration: 0.4 },
-  };
-
-  const stepTitles = [
-    "Choose a Username",
-    "Select Your Goals",
-    "Set Your Preferences",
-    "Tell Us How You Found AbsolutZero",
-    "Upload a Profile Image",
-  ];
 
   return (
-    <div
-      className={`min-h-screen flex flex-col items-center justify-center transition-all duration-500 ${
-        darkMode
-          ? "bg-gradient-to-br from-[#0b172a] to-[#142f46] text-white"
-          : "bg-gradient-to-br from-[#e7f1ff] to-[#cde6ff] text-gray-900"
-      }`}
-    >
-      <div className="absolute top-5 right-5">
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-        >
-          {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
-      </div>
-
-      <div className="max-w-md w-full bg-white/10 dark:bg-gray-900/40 backdrop-blur-xl p-8 rounded-2xl shadow-xl border border-white/20">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            {...fade}
-            className="flex flex-col items-center space-y-6"
-          >
-            <h2 className="text-2xl font-semibold text-center mb-2">
-              {stepTitles[step - 1]}
-            </h2>
-
-            {step === 1 && (
-              <input
-                type="text"
-                placeholder="Enter your username"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-                className="w-full p-3 rounded-lg border border-white/20 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
-              />
-            )}
-
-            {step === 2 && (
-              <div className="grid grid-cols-2 gap-3">
-                {["Focus", "Discipline", "Clarity", "Productivity"].map(
-                  (goal) => (
-                    <button
-                      key={goal}
-                      onClick={() => toggleGoal(goal)}
-                      className={`p-2 rounded-lg border ${
-                        formData.goals.includes(goal)
-                          ? "bg-blue-500 text-white border-blue-400"
-                          : "bg-transparent border-white/30"
-                      }`}
-                    >
-                      {goal}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="flex flex-col gap-3">
-                {["Dark Mode", "Pomodoro Timer", "Soundscapes", "Reminders"].map(
-                  (pref) => (
-                    <button
-                      key={pref}
-                      onClick={() => togglePreference(pref)}
-                      className={`p-2 rounded-lg border ${
-                        formData.preferences.includes(pref)
-                          ? "bg-blue-500 text-white border-blue-400"
-                          : "bg-transparent border-white/30"
-                      }`}
-                    >
-                      {pref}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
-
-            {step === 4 && (
-              <select
-                value={formData.discovery}
-                onChange={(e) =>
-                  setFormData({ ...formData, discovery: e.target.value })
-                }
-                className="w-full p-3 rounded-lg border border-white/20 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-800">
+      {/* Progress Circles */}
+      <div className="flex items-center justify-center mb-8 space-x-4">
+        {[...Array(totalSteps)].map((_, i) => {
+          const stepNum = i + 1;
+          const isActive = step >= stepNum;
+          return (
+            <div key={i} className="flex items-center">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold 
+                ${isActive ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"}`}
               >
-                <option value="">Select one...</option>
-                <option value="friend">A friend told me</option>
-                <option value="social">Saw it on social media</option>
-                <option value="web">Found it online</option>
-                <option value="other">Other</option>
-              </select>
-            )}
-
-            {step === 5 && (
-              <div className="flex flex-col items-center space-y-3">
-                <label
-                  htmlFor="file-upload"
-                  className="cursor-pointer flex flex-col items-center justify-center border border-white/30 rounded-xl p-6 hover:bg-white/10 transition"
-                >
-                  <Upload size={28} />
-                  <span className="mt-2">
-                    {formData.profileImage
-                      ? formData.profileImage.name
-                      : "Upload Image (Optional)"}
-                  </span>
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
+                {stepNum}
               </div>
-            )}
-
-            {/* Navigation buttons */}
-            <div className="flex justify-between w-full pt-6">
-              {step > 1 ? (
-                <button
-                  onClick={prevStep}
-                  className="px-4 py-2 flex items-center gap-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
-                >
-                  <ArrowLeft size={18} /> Back
-                </button>
-              ) : (
-                <div />
-              )}
-
-              {step < 5 ? (
-                <button
-                  onClick={nextStep}
-                  className="px-4 py-2 flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition"
-                >
-                  Next <ArrowRight size={18} />
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="px-4 py-2 flex items-center gap-2 rounded-lg bg-green-500 hover:bg-green-600 text-white transition"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin" /> Saving...
-                    </>
-                  ) : (
-                    "Finish"
-                  )}
-                </button>
+              {i < totalSteps - 1 && (
+                <div
+                  className={`w-8 h-1 ${
+                    step > stepNum ? "bg-blue-500" : "bg-gray-300"
+                  }`}
+                ></div>
               )}
             </div>
-          </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Steps Content */}
+      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg">
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                Choose a unique username
+              </h2>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                placeholder="username"
+              />
+              {usernameStatus && (
+                <p
+                  className={`mt-2 text-sm ${
+                    usernameStatus === "Available"
+                      ? "text-green-600"
+                      : usernameStatus === "Taken"
+                      ? "text-red-600"
+                      : "text-yellow-600"
+                  }`}
+                >
+                  {usernameStatus === "Available"
+                    ? "Available"
+                    : usernameStatus === "Taken"
+                    ? "Taken"
+                    : ` ${usernameStatus}`}
+                </p>
+              )}
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={nextStep}
+                  disabled={usernameStatus !== "Available"}
+                  className={`px-6 py-2 rounded-lg text-white ${
+                    usernameStatus === "Available"
+                      ? "bg-blue-500 hover:bg-blue-600"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                What are your main goals?
+              </h2>
+              <textarea
+                name="goals"
+                value={formData.goals}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                placeholder="E.g. improve focus, reduce distractions..."
+              />
+              <div className="mt-6 flex justify-between">
+                <button
+                  onClick={prevStep}
+                  className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={nextStep}
+                  className="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Next
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                Choose your preferences
+              </h2>
+              <input
+                type="text"
+                name="preferences"
+                value={formData.preferences}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                placeholder="Dark mode, focus duration..."
+              />
+              <div className="mt-6 flex justify-between">
+                <button
+                  onClick={prevStep}
+                  className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={nextStep}
+                  className="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Next
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                How did you hear about us?
+              </h2>
+              <select
+                name="source"
+                value={formData.source}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              >
+                <option value="">Select one...</option>
+                <option value="friend">From a friend</option>
+                <option value="social">Social media</option>
+                <option value="ad">Online ad</option>
+                <option value="other">Other</option>
+              </select>
+              <div className="mt-6 flex justify-between">
+                <button
+                  onClick={prevStep}
+                  className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={nextStep}
+                  className="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Next
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 5 && (
+            <motion.div
+              key="step5"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                Upload a profile image (optional)
+              </h2>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full"
+              />
+              <div className="mt-6 flex justify-between">
+                <button
+                  onClick={prevStep}
+                  className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Finish
+                </button>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>
   );
 }
-
