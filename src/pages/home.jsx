@@ -50,56 +50,68 @@ function Homepage() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/signin')}
             className="flex items-center justify-center gap-2 px-6 py-2.5 md:px-8 md:py-3 font-semibold rounded-full border-2 border-[#a0e9ff] dark:text-[#a0e9ff] text-[#0f2027] hover:bg-white/10 transition duration-300"
           >
-            <PlayCircle className="w-5 h-5" /> See How It Works
+            <PlayCircle className="w-5 h-5" /> Already have an account
           </motion.button>
         </div>
 
         {/* AbsolutZero Premium Coming Soon Mockup */}
-        <motion.div
-          variants={imageVariants}
-          initial="initial"
-          animate="animate"
-          transition={{ duration: 1, delay: 0.3 }}
-          className="mt-12 w-full max-w-4xl px-4"
-        >
-          <div className="relative h-80 w-full rounded-2xl shadow-xl overflow-hidden
-              bg-gradient-to-br from-[#1b3d4a] to-[#0f2027] border-2 border-[#a0e9ff]/30
-              flex flex-col items-center justify-center p-4 md:p-6 text-white text-center">
-            
-            <div className="absolute inset-0 bg-gradient-to-br from-[#a0e9ff]/5 to-transparent z-0"></div>
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.8, type: "spring", stiffness: 100 }}
-              className="relative z-10"
-            >
-              <Award className="w-16 h-16 md:w-20 md:h-20 text-yellow-300 mx-auto mb-4 drop-shadow-lg" strokeWidth={1.5} />
-              
-              <h3 className="text-3xl md:text-4xl font-extrabold text-[#a0e9ff] mb-1 drop-shadow-md">
-                AbsolutZero Premium
-              </h3>
-              
-              <p className="text-lg font-bold text-yellow-400 uppercase tracking-widest mb-3">
-                — Coming Soon —
-              </p>
+       <motion.div
+  variants={imageVariants}
+  initial="initial"
+  animate="animate"
+  transition={{ duration: 1, delay: 0.3 }}
+  className="mt-16 w-full px-6 sm:px-8 md:px-10 lg:px-0 flex justify-center"
+>
+  <div
+    className="relative w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden
+      bg-gradient-to-br from-[#1b3d4a] to-[#0f2027]
+      border border-[#a0e9ff]/30
+      flex flex-col items-center justify-center 
+      py-16 px-6 sm:py-20 sm:px-10 text-white text-center"
+  >
+    <div className="absolute inset-0 bg-gradient-to-br from-[#a0e9ff]/10 to-transparent z-0"></div>
 
-              <p className="text-base md:text-lg text-gray-200 max-w-md mx-auto mb-5">
-                Elevate your focus with advanced analytics, custom themes, and exclusive integrations.
-              </p>
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 px-6 py-2.5 md:px-8 md:py-3 font-bold bg-yellow-400 text-[#0f2027] rounded-full shadow-lg hover:bg-yellow-300 transition-all mx-auto"
-              >
-                <Zap className="w-5 h-5" /> Get Notified
-              </motion.button>
-            </motion.div>
-          </div>
-        </motion.div>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        delay: 0.5,
+        duration: 0.8,
+        type: "spring",
+        stiffness: 100,
+      }}
+      className="relative z-10 space-y-4 sm:space-y-6"
+    >
+      <Award className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 text-yellow-300 mx-auto mb-3 sm:mb-4 drop-shadow-lg" strokeWidth={1.5} />
+
+      <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#a0e9ff] tracking-tight mb-1 drop-shadow-md">
+        AbsolutZero Premium
+      </h3>
+
+      <p className="text-sm sm:text-base md:text-lg font-bold text-yellow-400 uppercase tracking-widest mb-2 sm:mb-3">
+        — Coming Soon —
+      </p>
+
+      <p className="text-base sm:text-lg text-gray-200 max-w-md mx-auto leading-relaxed mb-5 sm:mb-8">
+        Elevate your focus with advanced analytics, custom themes, and exclusive integrations.
+      </p>
+
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="inline-flex items-center gap-2 px-6 py-2.5 sm:px-8 sm:py-3 
+          font-bold bg-yellow-400 text-[#0f2027] rounded-full 
+          shadow-lg hover:bg-yellow-300 transition-all"
+      >
+        <Zap className="w-5 h-5 sm:w-6 sm:h-6" /> Get Notified
+      </motion.button>
+    </motion.div>
+  </div>
+</motion.div>
+
       </section>
 
       {/* 2. Trust Section */}

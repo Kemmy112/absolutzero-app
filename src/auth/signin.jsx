@@ -50,11 +50,11 @@ export default function Signin() {
       return;
     }
 
-    setMessage({ text: "Welcome back!", type: "success" });
+    setMessage({ text: "Signin success!", type: "success" });
     setTimeout(() => navigate("/dashboard"), 1000);
   };
 
-  // 🎨 Message animations
+
   const messageVariants = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
@@ -78,7 +78,7 @@ export default function Signin() {
         className="bg-white/70 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md"
       >
         <h1 className="text-3xl font-semibold text-center text-sky-700 mb-2">
-          Welcome back ❄️
+          Welcome back
         </h1>
         <p className="text-center text-sky-600 mb-6">
           Sign in to continue your focus journey
