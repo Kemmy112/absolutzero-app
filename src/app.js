@@ -14,6 +14,7 @@ import Forgotpassword from './pages/forgotpassword';
 import Resetpassword from './pages/resetpassword';
 import Onboarding from './pages/onboarding';
 import Dashboard from './pages/dashboard';
+import DashboardLayout from './components/dashboardlayout';
 import About from './pages/about';
 import Footer from './components/footer';
 
@@ -23,6 +24,7 @@ function App() {
     <Routes>
       <Route path='/' element={<Homepage/>} />
       <Route path='/navbar' element={<Navbar/>} />
+      <Route path='/dashboardlayout' element={<DashboardLayout/>} />
       <Route path='/themetoggle' element={<Themetoggle/>} />
       <Route path='/signup' element={<Signup/>} />
       <Route path='/verifyotp' element={<Verifyotp/>} />

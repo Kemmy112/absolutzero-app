@@ -1,66 +1,106 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Snowflake, BellOff, Target, BarChart, Leaf, Home } from "lucide-react";
+import { Snowflake, BellOff, Target, BarChart, Leaf } from "lucide-react";
 import Footer from "../components/footer";
-import { Link } from "react-router-dom";
 
 const About = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-800 dark:from-[#0f2027] dark:via-[#203a43] dark:to-[#2c5364] dark:text-[#a0e9ff] transition-colors">
-      {/* Header (replaces Navbar) */}
-      <header className="sticky top-0 z-50 backdrop-blur-lg bg-white/60 dark:bg-[#0f2027]/50 border-b border-sky-100 dark:border-gray-700 flex justify-between items-center px-6 py-4">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-sky-700 dark:text-[#a0e9ff] font-semibold text-xl tracking-wide"
-        >
-          <Snowflake className="w-6 h-6 animate-spin-slow" />
-          AbsolutZero
-        </Link>
-
-        {/* Right controls */}
-        <div className="flex items-center gap-4">
-          {/* Dark mode toggle */}
-          <button
-            onClick={() => document.documentElement.classList.toggle("dark")}
-            className="p-2 rounded-lg border border-sky-200 dark:border-gray-700 hover:bg-sky-100 dark:hover:bg-[#203a43] transition"
-            aria-label="Toggle dark mode"
+    <div className="w-full min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-800 dark:from-[#0f2027] dark:via-[#203a43] dark:to-[#2c5364] dark:text-[#a0e9ff] transition-colors duration-500">
+      
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-[#0f2027]/70 backdrop-blur-md border-b border-sky-100 dark:border-gray-700">
+        <div className="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
+          {/* Logo */}
+          <a
+            href="/"
+            className="flex items-center space-x-2 text-sky-700 dark:text-[#a0e9ff] font-bold text-xl"
           >
-            <svg
-              className="w-5 h-5 text-sky-700 dark:text-[#a0e9ff]"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
+            <Snowflake className="w-6 h-6 animate-spin-slow text-sky-500" />
+            <span>AbsolutZero</span>
+          </a>
+
+          {/* Desktop Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() =>
+                document.documentElement.classList.toggle("dark")
+              }
+              className="p-2 rounded-full bg-sky-100 dark:bg-gray-700 hover:bg-sky-200 dark:hover:bg-gray-600 transition"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-5 h-5 text-sky-700 dark:text-[#a0e9ff]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-7.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"
+                />
+              </svg>
+            </button>
 
-          {/* Home link */}
-          <Link
-            to="/"
-            className="flex items-center gap-1 text-sm font-medium text-sky-600 dark:text-[#a0e9ff] hover:underline"
-          >
-            <Home className="w-4 h-4" /> Home
-          </Link>
+            {/* CTA Button (Glowing Icy Effect) */}
+            <a
+              href="/signup"
+              className="relative overflow-hidden px-5 py-2.5 text-white font-semibold rounded-full bg-gradient-to-r from-sky-500 via-blue-500 to-cyan-500 shadow-[0_0_15px_rgba(56,189,248,0.5)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(56,189,248,0.7)]"
+            >
+              <span className="relative z-10">Create Account Now</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 opacity-0 hover:opacity-100 blur-xl transition-opacity duration-500"></span>
+            </a>
+          </div>
 
-          {/* CTA button */}
-          <Link
-            to="/signup"
-            className="relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-500 shadow-lg transition transform hover:scale-105"
-          >
-            <span className="relative z-10">Create Account Now</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 opacity-0 hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
-          </Link>
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 rounded-md bg-sky-100 dark:bg-gray-700 hover:bg-sky-200 dark:hover:bg-gray-600 transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-sky-700 dark:text-[#a0e9ff]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Dropdown */}
+        {menuOpen && (
+          <div className="md:hidden px-6 pb-4 flex flex-col space-y-3 bg-white/90 dark:bg-[#0f2027]/90 backdrop-blur-md border-t border-sky-100 dark:border-gray-700 animate-fadeIn">
+            <button
+              onClick={() =>
+                document.documentElement.classList.toggle("dark")
+              }
+              className="w-full text-left py-2 text-gray-700 dark:text-gray-200"
+            >
+              Toggle Dark Mode
+            </button>
+            <a
+              href="/signup"
+              className="block text-center py-2 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white font-medium"
+            >
+              Create Account Now
+            </a>
+          </div>
+        )}
       </header>
 
-      {/* Hero / Intro */}
+      {/* Hero Section */}
       <section className="max-w-5xl mx-auto px-6 py-20 text-center">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
@@ -76,10 +116,10 @@ const About = () => {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="text-lg md:text-xl text-gray-600 dark:text-gray-200 leading-relaxed max-w-3xl mx-auto"
         >
-          AbsolutZero is a distraction-free productivity app designed to help you
-          reclaim your focus and build meaningful daily habits. Inspired by deep
-          work and the Pomodoro technique, it turns your device into a focus
-          zone where interruptions fade and progress takes center stage.
+          AbsolutZero is a distraction-free productivity app designed to help
+          you reclaim your focus and build meaningful daily habits. Inspired by
+          deep work and the Pomodoro technique, it turns your device into a
+          focus zone where interruptions fade and progress takes center stage.
         </motion.p>
       </section>
 
@@ -171,4 +211,3 @@ const About = () => {
 };
 
 export default About;
-

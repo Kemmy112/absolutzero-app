@@ -130,6 +130,7 @@ export default function Dashboard() {
   };
 
   return (
+    <DashboardLayout>
     <div className="flex min-h-screen bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364] text-white">
       {/* 🧊 Sidebar (Unchanged) */}
       <aside className="hidden md:flex flex-col w-64 bg-white/10 backdrop-blur-lg border-r border-white/20 p-6 shadow-2xl">
@@ -341,6 +342,7 @@ export default function Dashboard() {
         </motion.div>
       </main>
     </div>
+    </DashboardLayout>
   );
 }
 
