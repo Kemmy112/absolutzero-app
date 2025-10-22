@@ -1,15 +1,63 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Snowflake, BellOff, Target, BarChart, Leaf } from "lucide-react";
-import Navbar from "../components/navbar";
+import { Snowflake, BellOff, Target, BarChart, Leaf, Home } from "lucide-react";
 import Footer from "../components/footer";
+import { Link } from "react-router-dom";
 
 const About = () => {
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-800 dark:from-[#0f2027] dark:via-[#203a43] dark:to-[#2c5364] dark:text-[#a0e9ff] transition-colors">
-      {/* Navbar */}
-      <header className="sticky top-0 z-50">
-        <Navbar />
+      {/* Header (replaces Navbar) */}
+      <header className="sticky top-0 z-50 backdrop-blur-lg bg-white/60 dark:bg-[#0f2027]/50 border-b border-sky-100 dark:border-gray-700 flex justify-between items-center px-6 py-4">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-sky-700 dark:text-[#a0e9ff] font-semibold text-xl tracking-wide"
+        >
+          <Snowflake className="w-6 h-6 animate-spin-slow" />
+          AbsolutZero
+        </Link>
+
+        {/* Right controls */}
+        <div className="flex items-center gap-4">
+          {/* Dark mode toggle */}
+          <button
+            onClick={() => document.documentElement.classList.toggle("dark")}
+            className="p-2 rounded-lg border border-sky-200 dark:border-gray-700 hover:bg-sky-100 dark:hover:bg-[#203a43] transition"
+            aria-label="Toggle dark mode"
+          >
+            <svg
+              className="w-5 h-5 text-sky-700 dark:text-[#a0e9ff]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+          </button>
+
+          {/* Home link */}
+          <Link
+            to="/"
+            className="flex items-center gap-1 text-sm font-medium text-sky-600 dark:text-[#a0e9ff] hover:underline"
+          >
+            <Home className="w-4 h-4" /> Home
+          </Link>
+
+          {/* CTA button */}
+          <Link
+            to="/signup"
+            className="relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-500 shadow-lg transition transform hover:scale-105"
+          >
+            <span className="relative z-10">Create Account Now</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 opacity-0 hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
+          </Link>
+        </div>
       </header>
 
       {/* Hero / Intro */}
@@ -20,7 +68,7 @@ const About = () => {
           transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-bold text-sky-700 dark:text-[#a0e9ff] mb-6"
         >
-          About AbsolutZero ❄️
+          About AbsolutZero
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -84,11 +132,11 @@ const About = () => {
             Our Aims
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[ 
+            {[
               { icon: BellOff, title: "Eliminate Distractions", desc: "Block noise and interruptions to keep your attention sharp." },
               { icon: Target, title: "Focus Intentionally", desc: "Work with purpose using structured Pomodoro sessions." },
               { icon: BarChart, title: "Track Your Progress", desc: "See your sessions add up and build consistent momentum." },
-              { icon: Leaf, title: "Build Sustainable Habits", desc: "Form long-term habits that support lasting productivity." }
+              { icon: Leaf, title: "Build Sustainable Habits", desc: "Form long-term habits that support lasting productivity." },
             ].map(({ icon: Icon, title, desc }, idx) => (
               <motion.div
                 key={idx}

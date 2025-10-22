@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsSun, BsMoon, BsList } from "react-icons/bs";
+import {Snowflake} from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -44,11 +45,7 @@ const Navbar = () => {
         className="flex items-center gap-3 cursor-pointer select-none"
         onClick={() => navigate("/")}
       >
-        <img
-          src="https://img.freepik.com/free-vector/realistic-elegant-frame-design_23-2149257738.jpg"
-          alt="logo"
-          className="w-10 h-10 rounded-full"
-        />
+        <Snowflake className="w-6 h-6 animate-spin-slow" />
         <span className="text-lg font-bold tracking-wide">AbsolutZero</span>
       </div>
 
