@@ -1,229 +1,236 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "../supabase";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { 
+  Loader2, Eye, EyeOff, User, Mail, Lock, 
+  ArrowLeft, Snowflake, ChevronRight 
+} from "lucide-react";
 
 export default function Signup() {
   const navigate = useNavigate();
 
   // Form state
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [agreeTnC, setAgreeTnC] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    agreeTnC: false,
+  });
+  
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
-  // Password visibility
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
-  // Password strength
-  const [passwordStrength, setPasswordStrength] = useState("");
-
-  // Load from localStorage
+  // Load draft from localStorage on mount
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("signupData"));
-    if (saved) {
-      setFullName(saved.fullName || "");
-      setEmail(saved.email || "");
-      setPassword(saved.password || "");
-      setConfirmPassword(saved.confirmPassword || "");
-      setAgreeTnC(saved.agreeTnC || false);
-    }
+    const saved = JSON.parse(localStorage.getItem("signup_draft"));
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []);
 
-  // Save to localStorage on change
-  useEffect(() => {
-    localStorage.setItem(
-      "signupData",
-      JSON.stringify({ fullName, email, password, confirmPassword, agreeTnC })
-    );
-  }, [fullName, email, password, confirmPassword, agreeTnC]);
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const newVal = type === "checkbox" ? checked : value;
+    const updatedData = { ...formData, [name]: newVal };
+    setFormData(updatedData);
+    
+    // Persist draft
+    localStorage.setItem("signup_draft", JSON.stringify(updatedData));
 
-  // Password strength checker
-  useEffect(() => {
-    if (!password) return setPasswordStrength("");
-    const strongPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-    if (!strongPattern.test(password)) setPasswordStrength("Weak");
-    else setPasswordStrength("Strong");
-  }, [password]);
+    if (name === "password") {
+      let score = 0;
+      if (value.length > 8) score++;
+      if (/[A-Z]/.test(value)) score++;
+      if (/[0-9]/.test(value)) score++;
+      if (/[\W_]/.test(value)) score++;
+      setPasswordStrength(score);
+    }
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
-    if (!fullName || !email || !password || !confirmPassword) {
-      setErrorMsg("All fields are required.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setErrorMsg("Passwords do not match.");
       return;
     }
 
-    const strongPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-    if (!strongPattern.test(password)) {
-      setErrorMsg(
-        "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
-      );
-      return;
-    }
-
-    if (!agreeTnC) {
-      setErrorMsg("You must agree to the Terms and Conditions.");
+    if (passwordStrength < 2) {
+      setErrorMsg("Please use a stronger password.");
       return;
     }
 
     try {
       setLoading(true);
-
-      // Supabase: send OTP to email
       const { error } = await supabase.auth.signInWithOtp({
-        email,
+        email: formData.email,
         options: {
-          data: { full_name: fullName, tempPassword: password },
+          data: { full_name: formData.fullName, tempPassword: formData.password },
           shouldCreateUser: true,
         },
       });
 
-      setLoading(false);
-      if (error) {
-        setErrorMsg(error.message);
-      } else {
-        // Redirect to verify OTP page
-        navigate("/verifyotp", { state: { email } });
-      }
+      if (error) throw error;
+      localStorage.removeItem("signup_draft");
+      navigate("/verifyotp", { state: { email: formData.email } });
     } catch (err) {
-      console.error(err);
+      setErrorMsg(err.message || "An unexpected error occurred.");
+    } finally {
       setLoading(false);
-      setErrorMsg("Unexpected error occurred. Please try again.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-sky-100 via-blue-200 to-sky-300">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
+    <div className="min-h-screen relative flex flex-col justify-center items-center px-4 py-12 transition-colors duration-500 bg-slate-50 dark:bg-[#020617] overflow-hidden">
+      
+      {/* Background Decorative Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full -z-10" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full -z-10" />
+
+      {/* Navigation - Fixed width container to match form center */}
+      <div className="w-full max-w-md mb-8">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-semibold">Back to home</span>
+        </Link>
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-white/70 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md"
+        className="w-full max-w-md"
       >
-        <h1 className="text-3xl font-semibold text-center text-sky-700 mb-6">
-          Create Account
-        </h1>
-
-        <form onSubmit={handleSignup} className="space-y-4">
-          {/* Full Name */}
-          <input
-            type="text"
-            placeholder="Full name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-sky-300 focus:ring-2 focus:ring-sky-500 outline-none"
-            required
-          />
-
-          {/* Email */}
-          <input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-sky-300 focus:ring-2 focus:ring-sky-500 outline-none"
-            required
-          />
-
-          {/* Password */}
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-sky-300 focus:ring-2 focus:ring-sky-500 outline-none pr-10"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-gray-500"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-          {password && (
-            <p
-              className={`text-sm ${
-                passwordStrength === "Strong" ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              Password strength: {passwordStrength}
+        {/* The Card - Added defined borders and smaller max-width */}
+        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl py-10 px-8 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 ring-8 ring-slate-900/[0.02] dark:ring-white/[0.02]">
+          
+          <div className="text-center mb-10">
+            <div className="inline-flex p-3 rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 mb-4">
+              <Snowflake className="w-8 h-8" />
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
+              Create Account
+            </h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              Join the minimalist productivity movement.
             </p>
-          )}
-
-          {/* Confirm Password */}
-          <div className="relative">
-            <input
-              type={showConfirm ? "text" : "password"}
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-sky-300 focus:ring-2 focus:ring-sky-500 outline-none pr-10"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-3 text-gray-500"
-            >
-              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
           </div>
 
-          {/* Terms & Conditions */}
-          <label className="flex items-center space-x-2 text-sm">
-            <input
-              type="checkbox"
-              checked={agreeTnC}
-              onChange={(e) => setAgreeTnC(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <span>
-              I agree to the{" "}
-              <a href="/terms" className="text-sky-600 hover:underline">
-                Terms and Conditions
-              </a>
-            </span>
-          </label>
+          <form onSubmit={handleSignup} className="space-y-4">
+            {/* Full Name */}
+            <div className="relative group">
+              <User className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-cyan-500 transition-colors" />
+              <input
+                name="fullName"
+                type="text"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 ring-cyan-500/20 focus:border-cyan-500 transition-all dark:text-white"
+                required
+              />
+            </div>
 
-          {/* Error */}
-          {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
+            {/* Email */}
+            <div className="relative group">
+              <Mail className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-cyan-500 transition-colors" />
+              <input
+                name="email"
+                type="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 ring-cyan-500/20 focus:border-cyan-500 transition-all dark:text-white"
+                required
+              />
+            </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-xl flex justify-center items-center"
-          >
-            {loading ? <Loader2 className="animate-spin" /> : "Sign Up"}
-          </button>
+            {/* Password */}
+            <div className="relative group">
+              <Lock className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-cyan-500 transition-colors" />
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full pl-12 pr-12 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 ring-cyan-500/20 focus:border-cyan-500 transition-all dark:text-white"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-3.5 text-slate-400 hover:text-cyan-500"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
 
-          <p className="text-center text-sm mt-3">
-            Already have an account?{" "}
-            <a href="/signin" className="text-sky-600 hover:underline">
-              Sign in
-            </a>
-          </p>
-        </form>
+            {/* Password Strength Indicator */}
+            {formData.password && (
+              <div className="flex gap-1.5 px-1 mt-1">
+                {[...Array(4)].map((_, i) => (
+                  <div 
+                    key={i} 
+                    className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                      i < passwordStrength 
+                        ? (passwordStrength <= 2 ? 'bg-amber-400' : 'bg-cyan-500') 
+                        : 'bg-slate-200 dark:bg-slate-800'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Terms */}
+            <div className="flex items-center gap-3 px-1 py-2">
+              <input
+                name="agreeTnC"
+                type="checkbox"
+                checked={formData.agreeTnC}
+                onChange={handleChange}
+                className="h-5 w-5 rounded-lg border-slate-300 dark:border-slate-700 text-cyan-600 focus:ring-cyan-500 transition-all cursor-pointer"
+                required
+              />
+              <label className="text-sm text-slate-500 dark:text-slate-400 leading-tight">
+                I agree to the <Link to="/terms" className="text-cyan-600 font-semibold hover:underline">Terms of Service</Link>
+              </label>
+            </div>
+
+            {errorMsg && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium"
+              >
+                {errorMsg}
+              </motion.div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center items-center gap-2 py-4 px-4 rounded-2xl shadow-xl shadow-cyan-500/20 text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] disabled:opacity-50 transition-all"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : <>Get Started <ChevronRight className="w-4 h-4" /></>}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Already have an account?{" "}
+              <Link to="/signin" className="font-bold text-cyan-600 hover:text-cyan-500 transition-colors">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
 }
-
-

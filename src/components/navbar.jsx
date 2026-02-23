@@ -1,89 +1,90 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BsSun, BsMoon, BsList } from "react-icons/bs";
-import {Snowflake} from 'lucide-react';
+import { Sun, Moon, Menu, X, Snowflake } from 'lucide-react'; // Switched to Lucide for consistency
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
 
-  // Load theme preference from localStorage
+  // Sync theme with document & localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setDarkMode(false);
-      document.documentElement.classList.remove("dark");
-    }
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    const isDark = savedTheme === "dark";
+    setDarkMode(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
   }, []);
-
-  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   const toggleTheme = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
-
-    if (newMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
+    const themeStr = newMode ? "dark" : "light";
+    document.documentElement.classList.toggle("dark", newMode);
+    localStorage.setItem("theme", themeStr);
   };
 
   return (
-    <nav className="w-full flex items-center justify-between px-6 py-4 
-  bg-gradient-to-r from-[#0f2027] via-[#203a43] to-[#2c5364] 
-  bg-opacity-90 backdrop-blur-md text-[#a0e9ff] font-display z-50 shadow-lg">
-
-      {/* Logo */}
-      <div
-        className="flex items-center gap-3 cursor-pointer select-none"
-        onClick={() => navigate("/")}
-      >
-        <Snowflake className="w-6 h-6 animate-spin-slow" />
-        <span className="text-lg font-bold tracking-wide">AbsolutZero</span>
-      </div>
-
-      {/* Right side: theme + hamburger */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={toggleTheme}
-          className="text-xl transition hover:scale-110"
-          title="Toggle Theme"
-        >
-          {darkMode ? <BsSun /> : <BsMoon />}
-        </button>
-
+    <nav className="fixed top-0 left-0 w-full z-[100] transition-all duration-300
+      bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl 
+      border-b border-slate-200 dark:border-slate-800 
+      text-slate-900 dark:text-slate-100 shadow-sm">
+      
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        
+        {/* Logo */}
         <div
-          className="md:hidden text-2xl cursor-pointer"
-          onClick={toggleMenu}
+          className="flex items-center gap-2.5 cursor-pointer group"
+          onClick={() => navigate("/")}
         >
-          <BsList />
+          <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 group-hover:rotate-12 transition-transform">
+            <Snowflake className="w-6 h-6" />
+          </div>
+          <span className="text-xl font-bold tracking-tight">AbsolutZero</span>
+        </div>
+
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-8">
+          <button 
+            onClick={() => navigate("/about")}
+            className="text-sm font-medium hover:text-cyan-500 transition-colors"
+          >
+            About
+          </button>
+          
+          <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-800" />
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-900 hover:ring-2 ring-cyan-500/20 transition-all text-slate-600 dark:text-slate-400"
+            aria-label="Toggle Theme"
+          >
+            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {/* Mobile Controls */}
+        <div className="flex md:hidden items-center gap-4">
+          <button onClick={toggleTheme} className="p-2">
+            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2">
+            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
 
-      {/* Links */}
-      <div
-        className={`${
-          menuOpen ? "flex" : "hidden"
-        } md:flex absolute md:static top-16 left-0 w-full md:w-auto bg-[#0f2027]/80 md:bg-transparent px-6 py-4 md:p-0 text-center md:text-left transition-all`}
-      >
-        <ul className="flex flex-col md:flex-row gap-6 md:gap-8 items-center w-full md:w-auto">
-          <li>
-            <a
-              onClick={() => navigate("/about")}
-              className="cursor-pointer text-base font-medium hover:underline"
-            >
-              About
-            </a>
-          </li>
-        </ul>
-      </div>
+      {/* Mobile Menu Overlay */}
+      {menuOpen && (
+        <div className="md:hidden absolute top-20 left-0 w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-4 animate-in slide-in-from-top-4">
+          <button 
+            onClick={() => { navigate("/about"); setMenuOpen(false); }}
+            className="text-lg font-medium py-2"
+          >
+            About
+          </button>
+        </div>
+      )}
     </nav>
   );
 };
