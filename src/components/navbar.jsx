@@ -1,90 +1,120 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Sun, Moon, Menu, X, Snowflake } from 'lucide-react'; // Switched to Lucide for consistency
+import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Snowflake, Menu, X, Moon, Sun, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const location = useLocation(); // This detects the current URL
 
-  // Sync theme with document & localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    const isDark = savedTheme === "dark";
-    setDarkMode(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
-  }, []);
-
-  const toggleTheme = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    const themeStr = newMode ? "dark" : "light";
-    document.documentElement.classList.toggle("dark", newMode);
-    localStorage.setItem("theme", themeStr);
+  const toggleDarkMode = () => {
+    document.documentElement.classList.toggle('dark');
   };
 
+  // Logic to determine which links to show
+  const navLinks = [
+    { name: 'Features', path: '/#features', showOnAbout: true },
+    { name: 'About', path: '/about', hideWhenActive: true },
+    { name: 'Pricing', path: '/#pricing', showOnAbout: true },
+  ];
+
   return (
-    <nav className="fixed top-0 left-0 w-full z-[100] transition-all duration-300
-      bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl 
-      border-b border-slate-200 dark:border-slate-800 
-      text-slate-900 dark:text-slate-100 shadow-sm">
-      
+    <nav className="fixed top-0 w-full z-[100] bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-900">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
-        {/* Logo */}
-        <div
-          className="flex items-center gap-2.5 cursor-pointer group"
-          onClick={() => navigate("/")}
-        >
-          <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 group-hover:rotate-12 transition-transform">
-            <Snowflake className="w-6 h-6" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">AbsolutZero</span>
-        </div>
+        {/* Logo - Always leads home */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <Snowflake className="w-8 h-8 text-cyan-500 group-hover:rotate-180 transition-transform duration-500" />
+          <span className="text-xl font-bold tracking-tighter text-slate-950 dark:text-white">
+            AbsolutZero
+          </span>
+        </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
-          <button 
-            onClick={() => navigate("/about")}
-            className="text-sm font-medium hover:text-cyan-500 transition-colors"
-          >
-            About
-          </button>
+          {navLinks.map((link) => (
+            // Only render the link if it's not the current page
+            (link.hideWhenActive && location.pathname === link.path) ? null : (
+              <Link
+                key={link.name}
+                to={link.path}
+                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+              >
+                {link.name}
+              </Link>
+            )
+          ))}
           
-          <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-800" />
+          <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800" />
+          
+          <button onClick={toggleDarkMode} className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
+            <Sun className="w-5 h-5 dark:hidden" />
+            <Moon className="w-5 h-5 hidden dark:block" />
+          </button>
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-900 hover:ring-2 ring-cyan-500/20 transition-all text-slate-600 dark:text-slate-400"
-            aria-label="Toggle Theme"
+          <button 
+            onClick={() => navigate('/signup')}
+            className="px-5 py-2.5 bg-slate-950 text-white dark:bg-white dark:text-slate-950 text-sm font-bold rounded-xl hover:scale-105 transition-all"
           >
-            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            Join Now
           </button>
         </div>
 
-        {/* Mobile Controls */}
+        {/* Mobile Toggle */}
         <div className="flex md:hidden items-center gap-4">
-          <button onClick={toggleTheme} className="p-2">
-            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          <button onClick={toggleDarkMode} className="p-2 text-slate-500">
+            <Sun className="w-5 h-5 dark:hidden" />
+            <Moon className="w-5 h-5 hidden dark:block" />
           </button>
-          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2">
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          <button onClick={() => setIsOpen(!isOpen)} className="text-slate-900 dark:text-white">
+            {isOpen ? <X /> : <Menu />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {menuOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-4 animate-in slide-in-from-top-4">
-          <button 
-            onClick={() => { navigate("/about"); setMenuOpen(false); }}
-            className="text-lg font-medium py-2"
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-20 left-0 w-full bg-white dark:bg-[#020617] border-b border-slate-200 dark:border-slate-900 px-6 py-8 md:hidden shadow-xl"
           >
-            About
-          </button>
-        </div>
-      )}
+            <div className="flex flex-col gap-6">
+              {/* If on About page, show 'Back to Home' instead of 'About' */}
+              {location.pathname === '/about' ? (
+                <Link 
+                  to="/" 
+                  onClick={() => setIsOpen(false)}
+                  className="text-2xl font-bold text-slate-900 dark:text-white flex items-center justify-between"
+                >
+                  Home <ChevronRight className="text-cyan-500" />
+                </Link>
+              ) : (
+                <Link 
+                  to="/about" 
+                  onClick={() => setIsOpen(false)}
+                  className="text-2xl font-bold text-slate-900 dark:text-white flex items-center justify-between"
+                >
+                  About <ChevronRight className="text-cyan-500" />
+                </Link>
+              )}
+
+              <Link to="/#features" onClick={() => setIsOpen(false)} className="text-lg text-slate-600 dark:text-slate-400">Features</Link>
+              <Link to="/#pricing" onClick={() => setIsOpen(false)} className="text-lg text-slate-600 dark:text-slate-400">Pricing</Link>
+              
+              <button 
+                onClick={() => navigate('/signup')}
+                className="w-full py-4 bg-cyan-600 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/20"
+              >
+                Get Started
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

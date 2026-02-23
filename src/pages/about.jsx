@@ -1,208 +1,183 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Snowflake, BellOff, Target, BarChart, Leaf } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { 
+  Snowflake, BellOff, Target, BarChart3, Leaf, 
+  ArrowLeft, Zap, ShieldCheck, Sparkles, ChevronRight 
+} from "lucide-react";
 import Footer from "../components/footer";
+import Navbar from "../components/navbar"; // Using your updated Navbar
 
 const About = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-800 dark:from-[#0f2027] dark:via-[#203a43] dark:to-[#2c5364] dark:text-[#a0e9ff] transition-colors duration-500">
-      
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-[#0f2027]/70 backdrop-blur-md border-b border-sky-100 dark:border-gray-700">
-        <div className="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
-          {/* Logo */}
-          <a
-            href="/"
-            className="flex items-center space-x-2 text-sky-700 dark:text-[#a0e9ff] font-bold text-xl"
+    <div className="w-full min-h-screen transition-colors duration-500 bg-slate-50 text-slate-900 dark:bg-[#020617] dark:text-slate-200">
+      <Navbar />
+
+      {/* 1. Hero Section */}
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        {/* Ambient background glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-cyan-500/10 dark:bg-cyan-500/5 blur-[120px] rounded-full -z-10" />
+        
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6"
           >
-            <Snowflake className="w-6 h-6 animate-spin-slow text-sky-500" />
-            <span>AbsolutZero</span>
-          </a>
-
-          {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={() =>
-                document.documentElement.classList.toggle("dark")
-              }
-              className="p-2 rounded-full bg-sky-100 dark:bg-gray-700 hover:bg-sky-200 dark:hover:bg-gray-600 transition"
-            >
-              <svg
-                className="w-5 h-5 text-sky-700 dark:text-[#a0e9ff]"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-7.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"
-                />
-              </svg>
-            </button>
-
-            {/* CTA Button (Glowing Icy Effect) */}
-            <a
-              href="/signup"
-              className="relative overflow-hidden px-5 py-2.5 text-white font-semibold rounded-full bg-gradient-to-r from-sky-500 via-blue-500 to-cyan-500 shadow-[0_0_15px_rgba(56,189,248,0.5)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(56,189,248,0.7)]"
-            >
-              <span className="relative z-10">Create Account Now</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 opacity-0 hover:opacity-100 blur-xl transition-opacity duration-500"></span>
-            </a>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 rounded-md bg-sky-100 dark:bg-gray-700 hover:bg-sky-200 dark:hover:bg-gray-600 transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-sky-700 dark:text-[#a0e9ff]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
+            <Sparkles className="w-3 h-3" /> Our Philosophy
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-7xl font-bold tracking-tight text-slate-950 dark:text-white mb-6"
+          >
+            Simplicity is the <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-500">
+              Ultimate Sophistication.
+            </span>
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto"
+          >
+            AbsolutZero was born from a simple realization: our tools should help us think, not compete for our attention. We build digital environments where deep work happens naturally.
+          </motion.p>
         </div>
-
-        {/* Mobile Dropdown */}
-        {menuOpen && (
-          <div className="md:hidden px-6 pb-4 flex flex-col space-y-3 bg-white/90 dark:bg-[#0f2027]/90 backdrop-blur-md border-t border-sky-100 dark:border-gray-700 animate-fadeIn">
-            <button
-              onClick={() =>
-                document.documentElement.classList.toggle("dark")
-              }
-              className="w-full text-left py-2 text-gray-700 dark:text-gray-200"
-            >
-              Toggle Dark Mode
-            </button>
-            <a
-              href="/signup"
-              className="block text-center py-2 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white font-medium"
-            >
-              Create Account Now
-            </a>
-          </div>
-        )}
-      </header>
-
-      {/* Hero Section */}
-      <section className="max-w-5xl mx-auto px-6 py-20 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl font-bold text-sky-700 dark:text-[#a0e9ff] mb-6"
-        >
-          About AbsolutZero
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-lg md:text-xl text-gray-600 dark:text-gray-200 leading-relaxed max-w-3xl mx-auto"
-        >
-          AbsolutZero is a distraction-free productivity app designed to help
-          you reclaim your focus and build meaningful daily habits. Inspired by
-          deep work and the Pomodoro technique, it turns your device into a
-          focus zone where interruptions fade and progress takes center stage.
-        </motion.p>
       </section>
 
-      {/* How It Works */}
-      <section className="bg-sky-50 dark:bg-transparent py-16 transition-colors">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-semibold text-sky-700 dark:text-[#a0e9ff] text-center mb-12">
-            How It Works
-          </h2>
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <motion.ul
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="space-y-6 text-lg text-gray-700 dark:text-gray-200"
-            >
-              <li>➊ Open the app – clean dashboard, no clutter.</li>
-              <li>➋ Set your task – define the goal for this session.</li>
-              <li>➌ Choose your timer – default Pomodoro or custom.</li>
-              <li>
-                ➍ Activate the{" "}
-                <span className="font-semibold">Freezer Mode</span>: notifications silenced, only urgent calls/messages allowed.
-              </li>
-              <li>➎ Track your progress – every session is logged.</li>
-            </motion.ul>
-
-            <motion.div
+      {/* 2. The Process (Step-by-Step) */}
+      <section className="max-w-7xl mx-auto px-6 py-24">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-3xl font-bold mb-8 dark:text-white">How it works</h2>
+            <div className="space-y-8">
+              {[
+                { step: "01", title: "Clear the Noise", desc: "Launch into a dashboard designed to vanish, leaving only your goal in sight." },
+                { step: "02", title: "Set the Freeze", desc: "Define your focus block. Whether it's 25 or 90 minutes, the environment adapts to you." },
+                { step: "03", title: "Deep Flow", desc: "Enter 'Freezer Mode'. Notifications are silenced, and digital distractions are held at bay." },
+                { step: "04", title: "Reflect", desc: "Analyze your patterns. Growth happens when you understand your peaks and valleys." }
+              ].map((item, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex gap-6"
+                >
+                  <span className="text-xl font-black text-cyan-500/30 dark:text-cyan-500/20 tabular-nums">{item.step}</span>
+                  <div>
+                    <h3 className="text-lg font-bold dark:text-white">{item.title}</h3>
+                    <p className="text-slate-600 dark:text-slate-400 mt-1">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="relative">
+            <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
               viewport={{ once: true }}
-              className="flex justify-center"
+              className="relative z-10 p-1 bg-gradient-to-br from-slate-200 to-transparent dark:from-slate-800 dark:to-transparent rounded-[2.5rem]"
             >
-              <div className="relative w-64 h-64 flex items-center justify-center bg-white dark:bg-[#203a43] shadow-lg rounded-2xl border border-sky-100 dark:border-gray-600">
-                <Snowflake className="w-24 h-24 text-sky-500 animate-pulse" />
-                <span className="absolute bottom-4 text-sm text-gray-500 dark:text-gray-300">
-                  Focus Freeze Mode
-                </span>
+              <div className="bg-white dark:bg-slate-900 rounded-[2.4rem] p-12 text-center shadow-2xl">
+                <div className="w-20 h-20 bg-cyan-500/10 text-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <Snowflake className="w-10 h-10 animate-pulse" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2 dark:text-white">Freezer Mode</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm italic">"The world can wait."</p>
+                <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-center gap-4">
+                    <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                    <Zap className="w-5 h-5 text-amber-500" />
+                    <BellOff className="w-5 h-5 text-rose-500" />
+                </div>
               </div>
             </motion.div>
+            {/* Background Glow for the card */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/20 blur-[80px] rounded-full -z-0" />
           </div>
         </div>
       </section>
 
-      {/* Our Aims */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-semibold text-sky-700 dark:text-[#a0e9ff] text-center mb-12">
-            Our Aims
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: BellOff, title: "Eliminate Distractions", desc: "Block noise and interruptions to keep your attention sharp." },
-              { icon: Target, title: "Focus Intentionally", desc: "Work with purpose using structured Pomodoro sessions." },
-              { icon: BarChart, title: "Track Your Progress", desc: "See your sessions add up and build consistent momentum." },
-              { icon: Leaf, title: "Build Sustainable Habits", desc: "Form long-term habits that support lasting productivity." },
-            ].map(({ icon: Icon, title, desc }, idx) => (
-              <motion.div
-                key={idx}
-                whileHover={{ scale: 1.05 }}
-                className="bg-white dark:bg-[#203a43] p-6 rounded-2xl shadow-md text-center transition-colors"
-              >
-                <Icon className="w-10 h-10 text-sky-500 mx-auto mb-4" />
-                <h3 className="font-semibold text-lg">{title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">{desc}</p>
-              </motion.div>
-            ))}
-          </div>
+      {/* 3. Core Aims (Bento Grid Style) */}
+      <section className="max-w-7xl mx-auto px-6 py-24 border-t border-slate-200 dark:border-slate-900">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold dark:text-white">Our Core Aims</h2>
+          <p className="text-slate-500 mt-2">The four pillars of the AbsolutZero experience.</p>
         </div>
+        
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {[
+            { icon: BellOff, title: "Zero Distractions", color: "text-rose-500", desc: "Silence the digital noise and reclaim your mental bandwidth." },
+            { icon: Target, title: "Intentionality", color: "text-cyan-500", desc: "Shift from busy-work to high-impact, meaningful progress." },
+            { icon: BarChart3, title: "Deep Insights", color: "text-amber-500", desc: "Visualize your flow state to optimize your peak performance hours." },
+            { icon: Leaf, title: "Sustainability", color: "text-emerald-500", desc: "Build a work rhythm that avoids burnout and promotes longevity." },
+          ].map((aim, idx) => (
+            <motion.div
+              key={idx}
+              variants={itemVariants}
+              whileHover={{ y: -5 }}
+              className="p-8 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all"
+            >
+              <aim.icon className={`w-8 h-8 ${aim.color} mb-6`} />
+              <h3 className="font-bold text-lg mb-2 dark:text-white">{aim.title}</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{aim.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
-      {/* Closing */}
-      <section className="bg-sky-700 dark:bg-[#0f2027] text-white py-16 transition-colors">
-        <div className="max-w-4xl mx-auto text-center px-6">
-          <h2 className="text-3xl font-bold mb-4">
-            Enter the Freezer. Reclaim Your Time.
-          </h2>
-          <p className="text-lg text-sky-100 dark:text-gray-300 max-w-2xl mx-auto">
-            AbsolutZero isn’t just a timer — it’s a commitment to deep focus and
-            meaningful progress.
-          </p>
-        </div>
+      {/* 4. Final CTA */}
+      <section className="max-w-5xl mx-auto px-6 py-24 text-center">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          className="bg-slate-950 dark:bg-white p-12 md:p-20 rounded-[3rem] text-white dark:text-slate-950 shadow-2xl overflow-hidden relative"
+        >
+          <div className="relative z-10">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+              Ready to enter the Freezer?
+            </h2>
+            <p className="text-slate-400 dark:text-slate-500 text-lg mb-10 max-w-xl mx-auto">
+              Join thousands of professionals who have stopped managing time and started managing focus.
+            </p>
+            <button 
+              onClick={() => navigate('/signup')}
+              className="px-10 py-5 bg-white dark:bg-slate-950 text-slate-950 dark:text-white font-bold rounded-2xl hover:scale-105 transition-all flex items-center gap-2 mx-auto"
+            >
+              Get Started for Free <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+          {/* Subtle decorative circle */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/20 blur-[100px] rounded-full" />
+        </motion.div>
       </section>
 
       <Footer />
