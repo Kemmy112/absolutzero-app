@@ -44,8 +44,16 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-slate-900 dark:text-white mb-4">Support</h4>
             <ul className="space-y-3 text-slate-500 dark:text-slate-400">
-              <li><a href="#" className="hover:text-cyan-500 transition-colors text-sm">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-cyan-500 transition-colors text-sm">Terms of Service</a></li>
+            <li>
+  <button type="button" className="hover:text-cyan-500 transition-colors text-sm bg-transparent border-none p-0 cursor-pointer">
+    Privacy Policy
+  </button>
+</li>
+<li>
+  <button type="button" className="hover:text-cyan-500 transition-colors text-sm bg-transparent border-none p-0 cursor-pointer">
+    Terms of Service
+  </button>
+</li>
               <li><a href="mailto:hello@absolutzero.com" className="hover:text-cyan-500 transition-colors text-sm">Contact Us</a></li>
             </ul>
           </div>
