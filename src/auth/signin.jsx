@@ -4,7 +4,7 @@ import { supabase } from "../supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Eye, EyeOff, Loader2, Mail, Lock, 
-  ArrowLeft, Snowflake, ChevronRight, LogIn 
+  ArrowLeft, ChevronRight, LogIn 
 } from "lucide-react";
 
 export default function Signin() {
